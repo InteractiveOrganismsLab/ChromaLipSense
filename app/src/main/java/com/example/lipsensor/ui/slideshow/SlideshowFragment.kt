@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.lipsensor.databinding.FragmentSlideshowBinding
 
+
+
 class SlideshowFragment : Fragment() {
 
     private var _binding: FragmentSlideshowBinding? = null
@@ -39,4 +41,5 @@ class SlideshowFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }
