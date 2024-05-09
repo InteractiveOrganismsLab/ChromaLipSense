@@ -13,7 +13,8 @@ import retrofit2.HttpException
 import java.io.IOException
 
 import com.example.lipsensor.network.MarsApi
-import com.example.lipsensor.model.MarsPhoto
+import java.io.File
+import java.io.FileInputStream
 
 sealed interface MarsUiState {
     data class Success(val photos: String) : MarsUiState
@@ -35,7 +36,7 @@ class SlideshowViewModel : ViewModel() {
         getMarsPhotos()
     }
 
-    fun getMarsPhotos() {
+    private fun getMarsPhotos() {
         viewModelScope.launch {
             marsUiState = MarsUiState.Loading
             marsUiState = try {

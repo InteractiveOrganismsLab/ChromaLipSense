@@ -11,3 +11,4 @@ data class MarsPhoto(
     @SerialName(value = "img_src")
     val imgSrc: String
 )
+

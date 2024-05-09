@@ -16,27 +16,36 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.core.Preview
 import java.lang.Exception
 import com.example.lipsensor.databinding.ActivityCameraBinding
-import com.example.lipsensor.NetworkUtils
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+import com.example.lipsensor.network.MarsApi
+import java.io.FileInputStream
+
+sealed interface MarsUiState {
+    data class Success(val photos: String) : MarsUiState
+    object Error : MarsUiState
+    object Loading : MarsUiState
+}
 
 class CameraActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityCameraBinding
-    private var imageCapture:ImageCapture? = null
-    private lateinit var outputDirectory:File
+    private var imageCapture: ImageCapture? = null
+    private lateinit var outputDirectory: File
 
-    private lateinit var cameraExecutor:ExecutorService
+    private lateinit var cameraExecutor: ExecutorService
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private var savedImageUri: Uri? = null // Variable to store the URI of the most recently saved image
+    private var savedImageUri: Uri? =
+        null // Variable to store the URI of the most recently saved image
 
-    override fun onCreate(savedInstanceState: Bundle?){
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        setContentView(R.layout.activity_camera)
         _binding = ActivityCameraBinding.inflate(layoutInflater)
@@ -44,62 +53,99 @@ class CameraActivity : AppCompatActivity() {
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        if(allPermissionGranted()){
-            Toast.makeText(this,
+        if (allPermissionGranted()) {
+            Toast.makeText(
+                this,
                 "We Have Permission",
-                Toast.LENGTH_SHORT).show()
+                Toast.LENGTH_SHORT
+            ).show()
             startCamera()
-        }else{
+        } else {
             ActivityCompat.requestPermissions(
-                this,Constants.REQUIRED_PERMISSIONS,
-                Constants.REQUEST_CODE_PERMISSIONS)
+                this, Constants.REQUIRED_PERMISSIONS,
+                Constants.REQUEST_CODE_PERMISSIONS
+            )
         }
-        binding.button.setOnClickListener{
-            Toast.makeText(this,
+        binding.button.setOnClickListener {
+            Toast.makeText(
+                this,
                 "Clicked",
-                Toast.LENGTH_SHORT).show()
+                Toast.LENGTH_SHORT
+            ).show()
             takePhoto()
         }
-        binding.send.setOnClickListener{
-            Toast.makeText(this,
+        binding.send.setOnClickListener {
+            Toast.makeText(
+                this,
                 "Sent",
-                Toast.LENGTH_SHORT).show()
-            sendPhoto()
+                Toast.LENGTH_SHORT
+            ).show()
+            //sendPhoto()
         }
     }
 
-    private fun sendPhoto() {
-        savedImageUri?.let { uri ->
-            val success = NetworkUtils.sendImageToServer(File(uri.path), "http://127.0.0.1:5000/predict")
-            if (success) {
-                Toast.makeText(this, "Image sent!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Failed to send image.", Toast.LENGTH_SHORT).show()
-            }
-        } ?: run {
-            Toast.makeText(this, "No image taken yet.", Toast.LENGTH_SHORT).show()
-        }
-    }
+//    private fun sendPhoto() {
+//        Log.d(
+//            Constants.TAG,
+//            "Start sendPicture"
+//        )
+//        savedImageUri?.let { uri ->
+//            val filePath = uri.path
+//            if (filePath != null) {
+//                sendImageFile(File(filePath))
+//            } else {
+//                // Handle the case where the URI doesn't have a valid file path
+//                Toast.makeText(this, "Failed to get file path from URI", Toast.LENGTH_SHORT).show()
+//            }
+//        } ?: run {
+//            // Handle the case where savedImageUri is null
+//            Toast.makeText(this, "No image taken yet.", Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
-    private fun getOutputDirectory(): File{
-        val mediaDir = externalMediaDirs.firstOrNull()?.let { mFile->
-            File(mFile, resources.getString(R.string.app_name)).apply{
+//    private fun sendImageFile(file: File) {
+//        // Read the bytes from the image file
+//        val fileBytes = FileInputStream(file).use { it.readBytes() }
+//
+//        // Send the bytes to the server
+//        try {
+//            val response = MarsApi.retrofitService.sendPhotos(fileBytes)
+//            if (response.isSuccessful) {
+//                println("Photo sent successfully")
+//            } else {
+//                println("Failed to send photo: ${response.code()}")
+//            }
+//        } catch (e: Exception) {
+//            println("Error sending photo: ${e.message}")
+//        }
+//    }
+
+    private fun getOutputDirectory(): File {
+        val mediaDir = externalMediaDirs.firstOrNull()?.let { mFile ->
+            File(mFile, resources.getString(R.string.app_name)).apply {
                 mkdirs()
             }
         }
-        return if(mediaDir != null && mediaDir.exists())
+        return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir
     }
 
-    private fun takePhoto(){
-        Log.d(Constants.TAG,
-            "Start takePicture")
+    private fun takePhoto() {
+        Log.d(
+            Constants.TAG,
+            "Start takePicture"
+        )
         val imageCapture = imageCapture ?: return
         val photoFile = File(
             outputDirectory,
-            SimpleDateFormat(Constants.FILE_NAME_FORMAT,
-                Locale.getDefault()).format(System
-                    .currentTimeMillis()) + ".jpg")
+            SimpleDateFormat(
+                Constants.FILE_NAME_FORMAT,
+                Locale.getDefault()
+            ).format(
+                System
+                    .currentTimeMillis()
+            ) + ".jpg"
+        )
 
         val outputOption = ImageCapture
             .OutputFileOptions
@@ -107,14 +153,16 @@ class CameraActivity : AppCompatActivity() {
             .build()
 
         imageCapture.takePicture(
-            outputOption,ContextCompat.getMainExecutor(this),
-            object :ImageCapture.OnImageSavedCallback {
+            outputOption, ContextCompat.getMainExecutor(this),
+            object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
 
                     savedImageUri = Uri.fromFile(photoFile)
                     val msg = "Photo Saved"
-                    Log.d(Constants.TAG,
-                        "Photo Saved")
+                    Log.d(
+                        Constants.TAG,
+                        "Photo Saved"
+                    )
                     Toast.makeText(
                         this@CameraActivity,
                         "$msg $savedImageUri",
@@ -122,10 +170,13 @@ class CameraActivity : AppCompatActivity() {
                     ).show()
 
                 }
-                override fun onError(exception: ImageCaptureException){
-                    Log.e(Constants.TAG,
+
+                override fun onError(exception: ImageCaptureException) {
+                    Log.e(
+                        Constants.TAG,
                         "onError: ${exception.message}",
-                        exception)
+                        exception
+                    )
                 }
             }
         )
@@ -159,18 +210,22 @@ class CameraActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray) {
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode == Constants.REQUEST_CODE_PERMISSIONS){
-            if(allPermissionGranted()){
+        if (requestCode == Constants.REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionGranted()) {
                 startCamera()
-            }else{
-                Toast.makeText(this,"Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    this, "Permissions not granted by the user.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 finish()
             }
         }
     }
+
     private fun allPermissionGranted() =
         Constants.REQUIRED_PERMISSIONS.all {
             ContextCompat.checkSelfPermission(
