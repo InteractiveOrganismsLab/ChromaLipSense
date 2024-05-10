@@ -13,8 +13,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 import com.example.lipsensor.network.MarsApi
-import java.io.File
-import java.io.FileInputStream
+
 
 sealed interface MarsUiState {
     data class Success(val photos: String) : MarsUiState

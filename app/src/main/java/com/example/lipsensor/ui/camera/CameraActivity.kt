@@ -9,6 +9,8 @@ import com.example.lipsensor.R
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
+import android.widget.TextView
+import android.view.View
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -23,7 +25,13 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import com.example.lipsensor.network.MarsApi
-import java.io.FileInputStream
+
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 
 sealed interface MarsUiState {
     data class Success(val photos: String) : MarsUiState
@@ -47,7 +55,6 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_camera)
         _binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
         outputDirectory = getOutputDirectory()
@@ -66,7 +73,7 @@ class CameraActivity : AppCompatActivity() {
                 Constants.REQUEST_CODE_PERMISSIONS
             )
         }
-        binding.button.setOnClickListener {
+        binding.buttonC.setOnClickListener {
             Toast.makeText(
                 this,
                 "Clicked",
@@ -74,51 +81,70 @@ class CameraActivity : AppCompatActivity() {
             ).show()
             takePhoto()
         }
-        binding.send.setOnClickListener {
+        binding.buttonS.setOnClickListener {
             Toast.makeText(
                 this,
                 "Sent",
                 Toast.LENGTH_SHORT
             ).show()
-            //sendPhoto()
+            sendPhoto()
         }
     }
 
-//    private fun sendPhoto() {
-//        Log.d(
-//            Constants.TAG,
-//            "Start sendPicture"
-//        )
-//        savedImageUri?.let { uri ->
-//            val filePath = uri.path
-//            if (filePath != null) {
-//                sendImageFile(File(filePath))
-//            } else {
-//                // Handle the case where the URI doesn't have a valid file path
-//                Toast.makeText(this, "Failed to get file path from URI", Toast.LENGTH_SHORT).show()
-//            }
-//        } ?: run {
-//            // Handle the case where savedImageUri is null
-//            Toast.makeText(this, "No image taken yet.", Toast.LENGTH_SHORT).show()
-//        }
-//    }
+    private fun sendPhoto() {
+        savedImageUri?.let { uri ->
+            val filePath = uri.path
+            if (filePath != null) {
+                val file = File(filePath)
+                if (file.exists()) {
+                    sendImageFile(file)
 
-//    private fun sendImageFile(file: File) {
-//        // Read the bytes from the image file
-//        val fileBytes = FileInputStream(file).use { it.readBytes() }
-//
-//        // Send the bytes to the server
-//        try {
-//            val response = MarsApi.retrofitService.sendPhotos(fileBytes)
-//            if (response.isSuccessful) {
-//                println("Photo sent successfully")
-//            } else {
-//                println("Failed to send photo: ${response.code()}")
-//            }
-//        } catch (e: Exception) {
-//            println("Error sending photo: ${e.message}")
-//        }
-//    }
+                } else {
+                    Toast.makeText(this, "File not found", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                // Handle the case where the URI doesn't have a valid file path
+                Toast.makeText(this, "Failed to get file path from URI", Toast.LENGTH_SHORT).show()
+            }
+        } ?: run {
+            // Handle the case where savedImageUri is null
+            Toast.makeText(this, "No image taken yet.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun sendImageFile(file: File){
+
+        // Create a multi-part form data part with the request body
+        val filePart = MultipartBody.Part.createFormData("files", file.name, file.asRequestBody())
+
+        // Use lifecycleScope.launch to launch a coroutine for the network request
+        lifecycleScope.launch {
+            try {
+                // Make the network request to send the photo
+                val response = MarsApi.retrofitService.sendPhotos(filePart)
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    println("Photo sent successfully")
+                    // Show the response body if it's not null
+                    responseBody?.let { body ->
+                        println("Predictions: ${body.predictions}")
+                        showPredictions(body.predictions)
+                    }
+                } else {
+                    println("Failed to send photo: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                println("Error sending photo: ${e.message}")
+            }
+        }
+    }
+
+    private fun showPredictions(predictions: List<Double>) {
+        val predictionsTextView = findViewById<TextView>(R.id.predictionsTextView)
+        val formattedPredictions = predictions.joinToString(separator = ", ") // Convert list to string
+        predictionsTextView.text = "Predictions: $formattedPredictions"
+        predictionsTextView.visibility = View.VISIBLE // Make TextView visible
+    }
 
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let { mFile ->
@@ -126,15 +152,10 @@ class CameraActivity : AppCompatActivity() {
                 mkdirs()
             }
         }
-        return if (mediaDir != null && mediaDir.exists())
-            mediaDir else filesDir
+        return mediaDir ?: filesDir
     }
 
     private fun takePhoto() {
-        Log.d(
-            Constants.TAG,
-            "Start takePicture"
-        )
         val imageCapture = imageCapture ?: return
         val photoFile = File(
             outputDirectory,
@@ -156,19 +177,13 @@ class CameraActivity : AppCompatActivity() {
             outputOption, ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-
                     savedImageUri = Uri.fromFile(photoFile)
                     val msg = "Photo Saved"
-                    Log.d(
-                        Constants.TAG,
-                        "Photo Saved"
-                    )
                     Toast.makeText(
                         this@CameraActivity,
                         "$msg $savedImageUri",
                         Toast.LENGTH_LONG
                     ).show()
-
                 }
 
                 override fun onError(exception: ImageCaptureException) {

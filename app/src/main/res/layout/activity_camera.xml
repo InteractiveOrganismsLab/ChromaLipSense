@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.camera.CameraActivity">
 
+
     <TextView
         android:id="@+id/description"
         android:layout_width="wrap_content"
@@ -16,10 +17,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.04" />
+        app:layout_constraintVertical_bias="0.022" />
+
+    <TextView
+        android:id="@+id/predictionsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Prediction"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.061" />
 
     <Button
-        android:id="@+id/send"
+        android:id="@+id/buttonS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send"
@@ -31,7 +45,7 @@
         app:layout_constraintVertical_bias="0.98" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/buttonC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Click Me"
