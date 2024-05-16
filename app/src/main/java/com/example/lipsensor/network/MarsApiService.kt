@@ -15,7 +15,8 @@ import retrofit2.http.Part
 
 private const val BASE_URL =
 //    "https://android-kotlin-fun-mars-server.appspot.com"
-    "http://10.0.2.2:5000/"
+//    "http://10.0.2.2:5000/"
+  "http://127.0.0.1:5000"
 
 /**
  * Use the Retrofit builder to build a retrofit object using a kotlinx.serialization converter
