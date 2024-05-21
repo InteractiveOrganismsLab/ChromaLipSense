@@ -31,6 +31,7 @@
             </intent-filter>
 
         </activity>
+        <activity android:name=".ui.gallery.GalleryActivity" />
     </application>
 
     <!-- Declare the camera hardware feature -->

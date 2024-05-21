@@ -1,5 +1,6 @@
 package com.example.lipsensor.ui.camera
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -29,9 +30,10 @@ import com.example.lipsensor.network.MarsApi
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+
+import com.example.lipsensor.ui.gallery.GalleryActivity
 
 sealed interface MarsUiState {
     data class Success(val photos: String) : MarsUiState
@@ -80,6 +82,8 @@ class CameraActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
             takePhoto()
+            val intent = Intent(this, GalleryActivity::class.java)
+            startActivity(intent)
         }
         binding.buttonS.setOnClickListener {
             Toast.makeText(
