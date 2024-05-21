@@ -13,8 +13,8 @@
 
         <!-- Define the action to navigate to CameraActivity -->
         <action
-            android:id="@+id/action_to_camera"
-            app:destination="@id/nav_camera" />
+            android:id="@+id/action_to_function"
+            app:destination="@id/nav_function" />
 
     </fragment>
 
@@ -36,11 +36,25 @@
         android:label="@string/menu_logout"
         tools:layout="@layout/fragment_logout" />
 
-
+    <fragment
+        android:id="@+id/nav_camera"
+        android:name="com.example.lipsensor.ui.camera.CameraFragment"
+        android:label="@string/menu_camera"
+        tools:layout="@layout/fragment_camera" >
+        <action
+            android:id="@+id/action_nav_camera_to_nav_gallery"
+            app:destination="@id/nav_gallery" />
+    </fragment>
 
     <activity
-        android:id="@+id/nav_camera"
+        android:id="@+id/nav_function"
         android:name="com.example.lipsensor.ui.camera.CameraActivity"
-        android:label="@string/menu_camera"
+        android:label="@string/lip_camera"
         tools:layout="@layout/activity_camera" />
+
+    <activity
+        android:id="@+id/nav_preview"
+        android:name="com.example.lipsensor.ui.camera.PreviewActivity"
+        android:label="@string/lip_photo"
+        tools:layout="@layout/activity_preview" />
 </navigation>

@@ -1,39 +1,31 @@
 package com.example.lipsensor.ui.camera
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.TextView
+import android.widget.Toast
+import android.content.pm.PackageManager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.*
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.lipsensor.R
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.widget.Toast
-import android.widget.TextView
-import android.view.View
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.core.Preview
-import java.lang.Exception
 import com.example.lipsensor.databinding.ActivityCameraBinding
+import com.example.lipsensor.network.MarsApi
+import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-import com.example.lipsensor.network.MarsApi
-
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-
-import com.example.lipsensor.ui.gallery.GalleryActivity
 
 sealed interface MarsUiState {
     data class Success(val photos: String) : MarsUiState
@@ -45,15 +37,13 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityCameraBinding
     private var imageCapture: ImageCapture? = null
     private lateinit var outputDirectory: File
-
     private lateinit var cameraExecutor: ExecutorService
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private var savedImageUri: Uri? =
-        null // Variable to store the URI of the most recently saved image
+    private var savedImageUri: Uri? = null // Variable to store the URI of the most recently saved image
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,34 +53,19 @@ class CameraActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (allPermissionGranted()) {
-            Toast.makeText(
-                this,
-                "We Have Permission",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "We Have Permission", Toast.LENGTH_SHORT).show()
             startCamera()
         } else {
-            ActivityCompat.requestPermissions(
-                this, Constants.REQUIRED_PERMISSIONS,
-                Constants.REQUEST_CODE_PERMISSIONS
-            )
+            ActivityCompat.requestPermissions(this, Constants.REQUIRED_PERMISSIONS, Constants.REQUEST_CODE_PERMISSIONS)
         }
+
         binding.buttonC.setOnClickListener {
-            Toast.makeText(
-                this,
-                "Clicked",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()
             takePhoto()
-            val intent = Intent(this, GalleryActivity::class.java)
-            startActivity(intent)
         }
+
         binding.buttonS.setOnClickListener {
-            Toast.makeText(
-                this,
-                "Sent",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Sent", Toast.LENGTH_SHORT).show()
             sendPhoto()
         }
     }
@@ -102,7 +77,6 @@ class CameraActivity : AppCompatActivity() {
                 val file = File(filePath)
                 if (file.exists()) {
                     sendImageFile(file)
-
                 } else {
                     Toast.makeText(this, "File not found", Toast.LENGTH_SHORT).show()
                 }
@@ -116,8 +90,7 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendImageFile(file: File){
-
+    private fun sendImageFile(file: File) {
         // Create a multi-part form data part with the request body
         val filePart = MultipartBody.Part.createFormData("files", file.name, file.asRequestBody())
 
@@ -163,19 +136,10 @@ class CameraActivity : AppCompatActivity() {
         val imageCapture = imageCapture ?: return
         val photoFile = File(
             outputDirectory,
-            SimpleDateFormat(
-                Constants.FILE_NAME_FORMAT,
-                Locale.getDefault()
-            ).format(
-                System
-                    .currentTimeMillis()
-            ) + ".jpg"
+            SimpleDateFormat(Constants.FILE_NAME_FORMAT, Locale.getDefault()).format(System.currentTimeMillis()) + ".jpg"
         )
 
-        val outputOption = ImageCapture
-            .OutputFileOptions
-            .Builder(photoFile)
-            .build()
+        val outputOption = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
         imageCapture.takePicture(
             outputOption, ContextCompat.getMainExecutor(this),
@@ -183,19 +147,17 @@ class CameraActivity : AppCompatActivity() {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     savedImageUri = Uri.fromFile(photoFile)
                     val msg = "Photo Saved"
-                    Toast.makeText(
-                        this@CameraActivity,
-                        "$msg $savedImageUri",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@CameraActivity, "$msg $savedImageUri", Toast.LENGTH_LONG).show()
+
+                    // Start PreviewActivity after the photo is saved and URI is set
+                    val intent = Intent(this@CameraActivity, PreviewActivity::class.java).apply {
+                        putExtra("EXTRA_SAVED_IMAGE_URI", savedImageUri.toString()) // Convert URI to string
+                    }
+                    startActivity(intent)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Log.e(
-                        Constants.TAG,
-                        "onError: ${exception.message}",
-                        exception
-                    )
+                    Log.e(Constants.TAG, "onError: ${exception.message}", exception)
                 }
             }
         )
@@ -226,31 +188,21 @@ class CameraActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == Constants.REQUEST_CODE_PERMISSIONS) {
             if (allPermissionGranted()) {
                 startCamera()
             } else {
-                Toast.makeText(
-                    this, "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
     }
 
-    private fun allPermissionGranted() =
-        Constants.REQUIRED_PERMISSIONS.all {
-            ContextCompat.checkSelfPermission(
-                baseContext, it
-            ) == PackageManager.PERMISSION_GRANTED
-        }
+    private fun allPermissionGranted() = Constants.REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
 
     override fun onDestroy() {
         super.onDestroy()

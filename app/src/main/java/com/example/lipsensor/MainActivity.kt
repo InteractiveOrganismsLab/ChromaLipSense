@@ -32,18 +32,17 @@ class MainActivity : AppCompatActivity() {
             // Get the NavController associated with the current Activity
             val navController = findNavController(R.id.nav_host_fragment_content_main)
 
-            // Navigate to the action associated with navigating to CameraActivity
-            navController.navigate(R.id.action_to_camera)
+            // Navigate to the action associated with navigating to CameraFragment
+            navController.navigate(R.id.action_to_function) // Make sure this ID is correct
         }
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
+        // Passing each menu ID as a set of Ids because each menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_logout, R.id.nav_camera
-            ), drawerLayout
+            setOf(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_logout, R.id.nav_camera), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
