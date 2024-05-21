@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             val navController = findNavController(R.id.nav_host_fragment_content_main)
 
             // Navigate to the action associated with navigating to CameraFragment
-            navController.navigate(R.id.action_to_function) // Make sure this ID is correct
+            navController.navigate(R.id.global_action_to_function) // Make sure this ID is correct
         }
 
         val drawerLayout: DrawerLayout = binding.drawerLayout

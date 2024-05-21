@@ -10,5 +10,8 @@
     <color name="pink_200">#eda1a1</color>
     <color name="pink_500">#e86f6f</color>
     <color name="pink_700">#944343</color>
+    <color name="gray">#666699</color>
+
+    <color name="pink">#ffb3ec</color>
 
 </resources>

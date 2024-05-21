@@ -11,10 +11,10 @@
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
 
-        <!-- Define the action to navigate to CameraActivity -->
-        <action
-            android:id="@+id/action_to_function"
-            app:destination="@id/nav_function" />
+
+<!--        <action-->
+<!--            android:id="@+id/action_to_function"-->
+<!--            app:destination="@id/nav_function" />-->
 
     </fragment>
 
@@ -28,7 +28,8 @@
         android:id="@+id/nav_slideshow"
         android:name="com.example.lipsensor.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_slideshow" >
+    </fragment>
 
     <fragment
         android:id="@+id/nav_logout"
@@ -57,4 +58,9 @@
         android:name="com.example.lipsensor.ui.camera.PreviewActivity"
         android:label="@string/lip_photo"
         tools:layout="@layout/activity_preview" />
+
+    <!-- Define the action to navigate to CameraActivity -->
+    <action
+        android:id="@+id/global_action_to_function"
+        app:destination="@id/nav_function" />
 </navigation>

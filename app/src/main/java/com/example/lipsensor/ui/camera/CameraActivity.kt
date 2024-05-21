@@ -64,10 +64,10 @@ class CameraActivity : AppCompatActivity() {
             takePhoto()
         }
 
-        binding.buttonS.setOnClickListener {
-            Toast.makeText(this, "Sent", Toast.LENGTH_SHORT).show()
-            sendPhoto()
-        }
+//        binding.buttonS.setOnClickListener {
+//            Toast.makeText(this, "Sent", Toast.LENGTH_SHORT).show()
+//            sendPhoto()
+//        }
     }
 
     private fun sendPhoto() {
