@@ -24,10 +24,10 @@
 
     <string name="description_text">
 
-        Discover a revolutionary way to monitor your health with ChromaLipSense, your personal lipstick-based biosensor. By simply applying our lipstick and capturing an image of your lips with our app, you can gain valuable insights into your health status based on lip color analysis.
+        Discover a revolutionary way to monitor your health with our personal lipstick-based biosensor. By simply applying our lipstick and capturing an image of your lips with our app, you can gain valuable insights into your health status based on lip color analysis.
     </string>
 
     <string name="ready_text">
-        Ready to begin? Click the purple camera button to start your health check now!
+        Ready to begin? Click the green camera button to start your health check now!
     </string>
 </resources>

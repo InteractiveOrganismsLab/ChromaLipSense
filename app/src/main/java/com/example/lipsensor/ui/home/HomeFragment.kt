@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.lipsensor.databinding.FragmentHomeBinding
+import com.example.lipsensor.R
 
 class HomeFragment : Fragment() {
 
@@ -32,8 +34,15 @@ class HomeFragment : Fragment() {
         homeViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+
+        // Set click listener for the send button
+        binding.buttonHistory.setOnClickListener {
+            findNavController().navigate(R.id.action_nav_home_to_nav_slideshow)
+        }
+
         return root
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

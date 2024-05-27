@@ -41,6 +41,7 @@ class PreviewActivity : AppCompatActivity() {
         // Set click listener for the send button
         binding.buttonS.setOnClickListener {
             Toast.makeText(this, "Sent", Toast.LENGTH_SHORT).show()
+            binding.buttonS.visibility = View.INVISIBLE // Make the button invisible
             sendPhoto()
         }
 
@@ -88,7 +89,7 @@ class PreviewActivity : AppCompatActivity() {
                     println("Photo sent successfully")
                     // Show the response body if it's not null
                     responseBody?.let { body ->
-                        println("Predictions: ${body.predictions}")
+                        println("Your pH: ${body.predictions}")
                         showPredictions(body.predictions)
                     }
                 } else {
@@ -102,7 +103,7 @@ class PreviewActivity : AppCompatActivity() {
 
     private fun showPredictions(predictions: List<Double>) {
         val formattedPredictions = predictions.joinToString(separator = ", ") // Convert list to string
-        binding.predictionsTextView.text = "Predictions: $formattedPredictions"
+        binding.predictionsTextView.text = "Your pH: $formattedPredictions"
         binding.predictionsTextView.visibility = View.VISIBLE // Make TextView visible
     }
 }
