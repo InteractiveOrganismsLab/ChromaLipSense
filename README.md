@@ -1,4 +1,5 @@
-﻿Lipstick
+##Fabrication
+###Lipstick
 Ingredients:
 Commercial Lipstick Base from TKB (33.3%) https://tkbtrading.com/products/lip-stick-base
 Cetyl alcohol (8.3%) https://a.co/d/3L3egQI
@@ -19,7 +20,7 @@ Red Cabbage Powder (33.3%) https://suncorefoods.com/products/cosmos-red-cabbage-
 9. Chill for 10 minutes before demolding 
 
 
-Lipgloss
+###Lipgloss
 Ingredients:
 Commercial Lipgloss Base from TKB (25%) https://tkbtrading.com/products/tkb-lip-gloss-base-flexagel?_pos=1&_sid=86a78b527&_ss=r
 Glycerin (8.3%) https://tkbtrading.com/collections/tkb-lip-gloss-versagel/products/glycerine
@@ -42,7 +43,7 @@ Red Cabbage Powder (33.3%)
 10. Cool till it is below 130°F to safely pour into container
 
 
-Lip stain/tint
+###Lip stain/tint
 Ingredients:
 30 g Red Cabbage Powder
 8 g Clear Silver Mica Powder 
@@ -60,3 +61,6 @@ Ingredients:
 6. add in the Phenoxyethanol and Polysorbate 80
 7. Stir for 20 minutes
 8. Put into containers
+
+## Contributing
+If you would like to contribute to this project, please fork the repository and submit a pull request.
